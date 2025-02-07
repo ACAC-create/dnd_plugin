@@ -3,7 +3,7 @@ from pkg.plugin.events import PersonNormalMessageReceived, GroupNormalMessageRec
 import random
 import re # 导入正则表达式模块
 
-@register(name="DnDCharacterCreator", description="D&D 5e character attribute roller & dice roller", version="1.2", author="AI & KirifujiNagisa") # 更新版本号
+@register(name="DnDCharacterCreator", description="D&D 5e character attribute roller & dice roller", version="1.3", author="AI & KirifujiNagisa") # 更新版本号
 class DnDCharacterCreatorPlugin(BasePlugin):
 
     def __init__(self, host: APIHost):
@@ -105,7 +105,9 @@ class DnDCharacterCreatorPlugin(BasePlugin):
                     ctx.add_return("reply", [reply])
                     ctx.prevent_default()
                 elif isinstance(roll_result, list): # 如果是多组骰子结果列表
-                    reply = f"<{ctx.event.sender_id if isinstance(ctx.event, GroupNormalMessageReceived) else 'user'}> 投掷 {command_parts} 结果: {', '.join(map(str, roll_result))}" # 将结果列表转换为逗号分隔的字符串
+                    results_str = ', '.join(map(str, roll_result)) # 将结果列表转换为逗号分隔的字符串
+                    total_sum = sum(roll_result) # 计算结果总和
+                    reply = f"<{ctx.event.sender_id if isinstance(ctx.event, GroupNormalMessageReceived) else 'user'}> 投掷 {command_parts} 结果: {results_str}  总和: {total_sum}" # 在回复消息中添加总和
                     ctx.add_return("reply", [reply])
                     ctx.prevent_default()
                 elif isinstance(roll_result, str) and "无效" in roll_result: # 处理 "无效的骰子类型" 或 "骰子数量无效" 错误
@@ -175,7 +177,9 @@ class DnDCharacterCreatorPlugin(BasePlugin):
                     ctx.add_return("reply", [reply])
                     ctx.prevent_default()
                 elif isinstance(roll_result, list): # 如果是多组骰子结果列表
-                    reply = f"<{sender_id}> 投掷 {command_parts} 结果: {', '.join(map(str, roll_result))}" # 将结果列表转换为逗号分隔的字符串
+                    results_str = ', '.join(map(str, roll_result)) # 将结果列表转换为逗号分隔的字符串
+                    total_sum = sum(roll_result) # 计算结果总和
+                    reply = f"<{sender_id}> 投掷 {command_parts} 结果: {results_str}  总和: {total_sum}" # 在回复消息中添加总和
                     ctx.add_return("reply", [reply])
                     ctx.prevent_default()
                 elif isinstance(roll_result, str) and "无效" in roll_result: # 处理 "无效的骰子类型" 或 "骰子数量无效" 错误
