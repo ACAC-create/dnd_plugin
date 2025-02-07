@@ -20,11 +20,12 @@ class DnDCharacterCreatorPlugin(BasePlugin):
             attributes.append(sum(rolls))
         return attributes
 
-    def roll_dice(self, dice_type):
+    def roll_dice(self, dice_command): #  参数改为接收完整的 dice_command (例如 ".rd20")
         """Rolls a single die of the specified type."""
         try:
-            dice_size = int(dice_type[1:]) # 从 "d20" 中提取 "20" 并转换为整数
-            if dice_size <= 0: #  修正：只需要判断是否小于等于 0
+            dice_type_str = dice_command[3:] # 从 ".rd20" 中提取 "20" (字符串形式)
+            dice_size = int(dice_type_str) # 将提取的数字字符串转换为整数
+            if dice_size <= 0:
                 return "无效的骰子类型"
             return random.randint(1, dice_size)
         except ValueError:
@@ -58,8 +59,7 @@ class DnDCharacterCreatorPlugin(BasePlugin):
             ctx.prevent_default()
         elif msg.startswith(".rd"): # 处理 .rd 骰子命令
             dice_command = msg.split(" ")[0] # 获取命令部分，例如 ".rd20"
-            dice_type = dice_command[3:] # 去除 ".rd" 前缀，例如 "20"
-            roll_result = self.roll_dice(dice_command) # 直接传入命令，roll_dice函数会处理 "rd20" 格式
+            roll_result = self.roll_dice(dice_command) #  **这里，直接把完整的 dice_command (例如 ".rd20") 传给 roll_dice**
             if isinstance(roll_result, int): # 如果 roll_dice 返回的是整数，说明是有效骰子类型
                 reply = f"<{ctx.event.sender_id if isinstance(ctx.event, GroupNormalMessageReceived) else 'user'}> 投掷 {dice_command} 结果: {roll_result}" # 群聊显示 sender_id, 私聊显示 user
                 ctx.add_return("reply", [reply])
@@ -99,8 +99,7 @@ class DnDCharacterCreatorPlugin(BasePlugin):
             ctx.prevent_default()
         elif msg.startswith(".rd"): # 群聊的 .rd 骰子命令处理逻辑和私聊基本一致
             dice_command = msg.split(" ")[0] # 获取命令部分，例如 ".rd20"
-            dice_type = dice_command[3:] # 去除 ".rd" 前缀，例如 "20"
-            roll_result = self.roll_dice(dice_command)
+            roll_result = self.roll_dice(dice_command) # **这里，同样直接传递 dice_command**
             if isinstance(roll_result, int):
                 reply = f"<{sender_id}> 投掷 {dice_command} 结果: {roll_result}"
                 ctx.add_return("reply", [reply])
